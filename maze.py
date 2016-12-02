@@ -7,7 +7,7 @@ pygame.init()
 
 
 # Window
-WIDTH = 800
+WIDTH = 1000
 HEIGHT = 600
 SIZE = (WIDTH, HEIGHT)
 TITLE = "Maze"
@@ -25,6 +25,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 GREEN = (0, 255, 0)
+DINO_GREEN = (0, 61, 26)
 
 
 # Make a player
@@ -34,11 +35,36 @@ player_vy = 0
 player_speed = 5
 
 # make walls
-wall1 =  [300, 275, 200, 25]
-wall2 =  [400, 450, 200, 25]
-wall3 =  [100, 100, 25, 200]
+#wall1 =  [300, 275, 200, 25]
+#wall2 =  [400, 450, 200, 25]
+wall3 =  [100, 190-110, 25, 75]
+wall4 = [100, 301-110, 100, 25]
+wall5 = [199, 301-110, 25, 320]
+wall6 = [100, 170-110, 180, 25]
+wall7 = [277, 170-110, 25, 280]
+wall8 = [278, 328, 370, 25]
+wall9 = [198, 511, 450, 25]
+wall10 = [647, 328, 25, 130]
+wall11 = [647, 500, 25, 36]
+wall12 = [274, 536, 25, 50]
+wall13 = [528, 536, 25, 50]
+wall14 = [277, 330, 15, 140]
+wall15 = [277, 460, 100, 15]
+wall16 = [374, 440, 15, 35]
+wall17 = [439, 400, 15, 130]
+wall18 = [319, 435, 70, 15]
+wall19 = [319, 400, 15, 45]
+wall20 = [320, 400, 30, 5]
+wall21 = [400, 400, 50, 5]
+wall22 = [335, 350, 15, 52]
+wall23 = [400, 385, 15, 15]
+wall24 = [400, 380, 80, 5]
 
-walls = [wall1, wall2, wall3]
+
+walls = [wall3, wall4, wall5, wall6, wall7,
+         wall8, wall9, wall10, wall11, wall12, wall13,
+         wall14, wall15, wall16, wall17, wall18, wall19,
+         wall20, wall21, wall22, wall23, wall24]
 
 # Make coins
 coin1 = [300, 500, 25, 25]
@@ -58,6 +84,8 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            print(event.pos)
 
     pressed = pygame.key.get_pressed()
 
@@ -106,7 +134,20 @@ while not done:
 
 
     ''' here is where you should resolve player collisions with screen edges '''
+    top = player[1]
+    bottom = player[1] + player[3]
+    left = player[0]
+    right = player[0] + player[2]
+    
+    if top < 0:
+        player[1] = 0
+    elif bottom > HEIGHT:
+        player[1] = HEIGHT - player[3]
 
+    if left < 0:
+        player[0] = 0
+    elif right > WIDTH:
+        player[0] = WIDTH - player[2]
 
 
 
@@ -124,7 +165,7 @@ while not done:
     pygame.draw.rect(screen, WHITE, player)
     
     for w in walls:
-        pygame.draw.rect(screen, RED, w)
+        pygame.draw.rect(screen, DINO_GREEN, w)
 
     for c in coins:
         pygame.draw.rect(screen, YELLOW, c)
