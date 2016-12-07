@@ -8,7 +8,7 @@ pygame.init()
 
 # Window
 WIDTH = 1000
-HEIGHT = 600
+HEIGHT = 700
 SIZE = (WIDTH, HEIGHT)
 TITLE = "Maze"
 screen = pygame.display.set_mode(SIZE)
@@ -26,6 +26,8 @@ BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 GREEN = (0, 255, 0)
 DINO_GREEN = (0, 61, 26)
+PINK = (255, 0, 157)
+SKY_BLUE = (189, 236, 252)
 
 
 # Make a player
@@ -56,26 +58,61 @@ wall18 = [319, 435, 70, 15]
 wall19 = [319, 400, 15, 45]
 wall20 = [320, 400, 30, 5]
 wall21 = [400, 400, 50, 5]
-wall22 = [335, 350, 15, 52]
+#wall22 = [335, 350, 15, 52]
 wall23 = [400, 385, 15, 15]
 wall24 = [400, 380, 80, 5]
+wall25 = [525, 381-3, 50, 5]
+wall26 = [560, 382, 15, 40]
+wall27 = [488, 420, 87, 5]
+wall28 = [574, 396, 60, 5]
+wall29 = [222, 228, 30, 5]
+wall30 = [250, 281, 30, 5]
+wall31 = [220, 330, 30, 5]
+wall32 = [251, 377, 30, 5]
+wall33 = [220, 422, 30, 5]
+wall34 = [255, 470, 30, 5]
+wall35 = [489, 420, 15, 40]
+wall36 = [489, 455, 110, 5]
+wall37 = [453, 491, 20, 5]
+wall38 = [513, 491, 50, 5]
+wall39 = [595, 455, 5, 20]
+wall40 = [558, 492, 5, 25]
+wall41 = [629, 400, 5, 75]
+wall42 = [382, 390, 30, 5]
+wall43 = [416, 406, 5, 75]
 
 
 walls = [wall3, wall4, wall5, wall6, wall7,
          wall8, wall9, wall10, wall11, wall12, wall13,
-         wall14, wall15, wall16, wall17, wall18, wall19,
-         wall20, wall21, wall22, wall23, wall24]
+         wall14, wall15,wall16, wall17, wall18,wall19,
+         wall20, wall21, wall23, wall24, wall25,
+         wall26, wall27, wall28, wall29, wall30, wall31,
+         wall32, wall33, wall34, wall35, wall36, wall37,
+         wall38, wall39, wall40, wall41, wall42, wall43]
 
 # Make coins
-coin1 = [300, 500, 25, 25]
+coin1 = [300, 362, 25, 25]
 coin2 = [400, 200, 25, 25]
 coin3 = [150, 150, 25, 25]
 
 coins = [coin1, coin2, coin3]
 
+# Make switch
+switch = [603, 366, 25, 25]
+
+# Make doors
+door1 = [647, 457, 25, 50]
+door2 = [335, 350, 15, 52]
+
+doors = [door1, door2]
+
+# Make collidables
+collidables = walls + doors
 
 # Game loop
 win = False
+doors_open = False
+
 done = False
 
 while not done:
@@ -114,23 +151,21 @@ while not done:
     player[0] += player_vx
 
     ''' resolve collisions horizontally '''
-    for w in walls:
-        if intersects.rect_rect(player, w):        
+    for c in collidables:
+        if intersects.rect_rect(player, c):        
             if player_vx > 0:
-                player[0] = w[0] - player[2]
+                player[0] = c[0] - player[2]
             elif player_vx < 0:
-                player[0] = w[0] + w[2]
-
+                player[0] = c[0] + c[2]
     ''' move the player in vertical direction '''
     player[1] += player_vy
     
-    ''' resolve collisions vertically '''
-    for w in walls:
-        if intersects.rect_rect(player, w):                    
+    for c in collidables:
+        if intersects.rect_rect(player, c):                    
             if player_vy > 0:
-                player[1] = w[1] - player[3]
+                player[1] = c[1] - player[3]
             if player_vy < 0:
-                player[1] = w[1] + w[3]
+                player[1] = c[1] + c[3]
 
 
     ''' here is where you should resolve player collisions with screen edges '''
@@ -153,26 +188,44 @@ while not done:
 
 
     ''' get the coins '''
-    coins = [c for c in coins if not intersects.rect_rect(player, c)]
+    hit_list = [c for c in coins if intersects.rect_rect(player, c)]
 
+    for hit in hit_list:
+        coins.remove(hit)
+        #score += 1
+        #play sound, etc.
+
+
+    ''' open door on switch contact '''
+    if intersects.rect_rect(player, switch):
+        doors_open = True
+
+        collidables = [c for c in collidables if c not in doors]
+        
+    
     if len(coins) == 0:
         win = True
-
         
     # Drawing code (Describe the picture. It isn't actually drawn yet.)
-    screen.fill(BLACK)
+    screen.fill(SKY_BLUE)
 
-    pygame.draw.rect(screen, WHITE, player)
+    pygame.draw.rect(screen, BLACK, player)
     
     for w in walls:
         pygame.draw.rect(screen, DINO_GREEN, w)
 
     for c in coins:
         pygame.draw.rect(screen, YELLOW, c)
-        
+
+    pygame.draw.rect(screen, YELLOW, switch)
+
+    if not doors_open:
+        for d in doors:
+            pygame.draw.rect(screen, DINO_GREEN, d)
+            
     if win:
         font = pygame.font.Font(None, 48)
-        text = font.render("You Win!", 1, GREEN)
+        text = font.render("You Win!", 1, PINK)
         screen.blit(text, [400, 200])
 
     
