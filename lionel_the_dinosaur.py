@@ -58,7 +58,7 @@ wall18 = [319, 435, 70, 15]
 wall19 = [319, 400, 15, 45]
 wall20 = [320, 400, 30, 5]
 wall21 = [400, 400, 50, 5]
-wall22 = [335, 350, 15, 52]
+#wall22 = [335, 350, 15, 52]
 wall23 = [400, 385, 15, 15]
 wall24 = [400, 380, 80, 5]
 wall25 = [525, 381-3, 50, 5]
@@ -85,29 +85,39 @@ wall43 = [416, 406, 5, 75]
 walls = [wall3, wall4, wall5, wall6, wall7,
          wall8, wall9, wall10, wall11, wall12, wall13,
          wall14, wall15, wall16, wall17, wall18, wall19,
-         wall20, wall21, wall22, wall23, wall24, wall25,
+         wall20, wall21, wall23, wall24, wall25,
          wall26, wall27, wall28, wall29, wall30, wall31,
          wall32, wall33, wall34, wall35, wall36, wall37,
          wall38, wall39, wall40, wall41, wall42, wall43]
 
 # Make coins
-coin1 = [300, 500, 25, 25]
-coin2 = [400, 200, 25, 25]
-coin3 = [150, 150, 25, 25]
+coin1 = [337, 408, 25, 25]
+coin2 = [301, 363, 25, 25]
+coin3 = [517, 428, 25, 25]
 
 coins = [coin1, coin2, coin3]
 
 # Make switch
 switch = [603, 366, 25, 25]
 
+
 # Make doors
 door1 = [647, 457, 25, 50]
+door2 = [335, 350, 15, 52]
 
-doors = [door1]
+doors = [door1, door2]
 
 # Make collidables
 collidables = walls + doors
 
+# Splashscreen
+started = False
+def splashscreen():
+    if started == False:
+        font = pygame.font.Font(None, 48)
+        text = font.render("Press Space to Play", 1, PINK)
+        screen.blit(text, [400, 200])
+    
 # Game loop
 win = False
 doors_open = False
@@ -122,6 +132,12 @@ while not done:
             done = True
         if event.type == pygame.MOUSEBUTTONUP:
             print(event.pos)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                if not started:
+                    started = True
+            
+            
 
     pressed = pygame.key.get_pressed()
 
@@ -130,19 +146,22 @@ while not done:
     left = pressed[pygame.K_LEFT]
     right = pressed[pygame.K_RIGHT]
 
-    if up:
-        player_vy = -player_speed
-    elif down:
-        player_vy = player_speed
-    else:
-        player_vy = 0
+    if started:
         
-    if left:
-        player_vx = -player_speed
-    elif right:
-        player_vx = player_speed
-    else:
-        player_vx = 0
+        if up:
+            player_vy = -player_speed
+        elif down:
+            player_vy = player_speed
+        else:
+            player_vy = 0
+            
+        if left:
+            player_vx = -player_speed
+        elif right:
+            player_vx = player_speed
+        else:
+            player_vx = 0
+
 
         
     # Game logic (Check for collisions, update points, etc.)
@@ -185,7 +204,6 @@ while not done:
 
 
 
-
     ''' get the coins '''
     hit_list = [c for c in coins if intersects.rect_rect(player, c)]
 
@@ -220,8 +238,11 @@ while not done:
 
     if not doors_open:
         for d in doors:
-            pygame.draw.rect(screen, PINK, d)
-            
+            pygame.draw.rect(screen, DINO_GREEN, d)
+
+
+    splashscreen()
+     
     if win:
         font = pygame.font.Font(None, 48)
         text = font.render("You Win!", 1, PINK)
