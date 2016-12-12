@@ -94,11 +94,12 @@ walls = [wall3, wall4, wall5, wall6, wall7,
 coin1 = [337, 408, 25, 25]
 coin2 = [301, 363, 25, 25]
 coin3 = [517, 428, 25, 25]
+coin3 = [530, 386, 25, 25]
 
 coins = [coin1, coin2, coin3]
 
 # Make switch
-switch = [603, 366, 25, 25]
+switch = [172, 107, 25, 25]
 
 
 # Make doors
@@ -116,7 +117,8 @@ def splashscreen():
     if started == False:
         font = pygame.font.Font(None, 48)
         text = font.render("Press Space to Play", 1, PINK)
-        screen.blit(text, [400, 200])
+        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+        screen.blit(text, text_rect)
     
 # Game loop
 win = False
@@ -234,7 +236,7 @@ while not done:
     for c in coins:
         pygame.draw.rect(screen, YELLOW, c)
 
-    pygame.draw.rect(screen, GREEN, switch)
+    pygame.draw.rect(screen, DINO_GREEN, switch)
 
     if not doors_open:
         for d in doors:
@@ -246,7 +248,8 @@ while not done:
     if win:
         font = pygame.font.Font(None, 48)
         text = font.render("You Win!", 1, PINK)
-        screen.blit(text, [400, 200])
+        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+        screen.blit(text, text_rect)
 
     
     # Update screen (Actually draw the picture in the window.)
