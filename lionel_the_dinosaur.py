@@ -29,6 +29,9 @@ DINO_GREEN = (0, 61, 26)
 PINK = (255, 0, 157)
 SKY_BLUE = (189, 236, 252)
 
+#image
+img = pygame.image.load('splashscreen.png') 
+
 
 # Make a player
 player =  [200, 150, 25, 25]
@@ -115,14 +118,16 @@ collidables = walls + doors
 started = False
 def splashscreen():
     if started == False:
+        screen.blit (img,(0,0))
         font = pygame.font.Font(None, 48)
         text = font.render("Press Space to Play", 1, PINK)
-        text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
+        text_rect = text.get_rect(center=(465, 240))
         screen.blit(text, text_rect)
     
 # Game loop
 win = False
 doors_open = False
+score = 0
 
 done = False
 
@@ -207,12 +212,26 @@ while not done:
 
 
     ''' get the coins '''
+     #coins = [c for c in coins if not intersects.rect_rect(player, c)]
+
+    '''
+    hit_list = []
+
+    for c in coins:
+        if intersects.rect_rect(player, c):
+            hit_list.append(c)
+    '''
+    
     hit_list = [c for c in coins if intersects.rect_rect(player, c)]
 
     for hit in hit_list:
         coins.remove(hit)
-        #score += 1
-        #play sound, etc.
+        score += 1
+        
+
+
+    if len(coins) == 0:
+        win = True
 
 
     ''' open door on switch contact '''
@@ -221,9 +240,6 @@ while not done:
 
         collidables = [c for c in collidables if c not in doors]
         
-    
-    if len(coins) == 0:
-        win = True
         
     # Drawing code (Describe the picture. It isn't actually drawn yet.)
     screen.fill(SKY_BLUE)
