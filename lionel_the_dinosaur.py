@@ -30,7 +30,12 @@ PINK = (255, 0, 157)
 SKY_BLUE = (189, 236, 252)
 
 #image
-img = pygame.image.load('splashscreen.png') 
+img = pygame.image.load('splashscreen.png')
+
+# stages
+START = 0
+PLAYING = 1
+END = 2
 
 
 # Make a player
@@ -128,6 +133,8 @@ def splashscreen():
 win = False
 doors_open = False
 score = 0
+ticks = 0
+time_remaining = 60
 
 done = False
 
@@ -169,6 +176,31 @@ while not done:
         else:
             player_vx = 0
 
+        ticks += 1
+
+        if stage == START:
+            if event.key == pygame.K_SPACE:
+                    stage = PLAYING
+                    
+        elif stage == PLAYING:
+            if event.key == pygame.K_LEFT:
+                    block_vel[0] -= 2
+            elif event.key == pygame.K_RIGHT:
+                    block_vel[0] += 2
+            elif event.key == pygame.K_UP:
+                    block_vel[1] -= 2
+            elif event.key == pygame.K_DOWN:
+                    block_vel[1] += 2
+                    
+        elif stage == END:
+            if event.key == pygame.K_SPACE:
+                    setup()
+
+        font = pygame.font.Font(None, 48)
+        text = font.render(str(time_remaining), 1, PINK)
+        text_rect = text.get_rect(center=(820, 40))
+        screen.blit(text, text_rect)
+
 
         
     # Game logic (Check for collisions, update points, etc.)
@@ -209,6 +241,16 @@ while not done:
     elif right > WIDTH:
         player[0] = WIDTH - player[2]
 
+    ''' timer stuff '''
+    if stage == PLAYING:
+        ticks += 1
+
+        if ticks % refresh_rate == 0:
+            time_remaining -= 1
+
+        if time_remaining == 0:
+            stage = END    
+
 
 
     ''' get the coins '''
@@ -227,6 +269,7 @@ while not done:
     for hit in hit_list:
         coins.remove(hit)
         score += 1
+        print("sound!")
         
 
 
@@ -260,17 +303,38 @@ while not done:
 
 
     splashscreen()
-     
+    if started:
+        font = pygame.font.Font(None, 48)
+        text = font.render("Score: " + str(score), 1, PINK)
+        text_rect = text.get_rect(center=(820, 40))
+        screen.blit(text, text_rect)
+    
     if win:
         font = pygame.font.Font(None, 48)
         text = font.render("You Win!", 1, PINK)
         text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
         screen.blit(text, text_rect)
 
+    ''' timer text '''
+    timer_text = MY_FONT.render(str(time_remaining), True, WHITE)
+    screen.blit(timer_text, [50, 50])
+    
+    ''' begin/end game text '''
+    if stage == START:
+        text1 = MY_FONT.render("Block", True, WHITE)
+        text2 = MY_FONT.render("(Press SPACE to play.)", True, WHITE)
+        screen.blit(text1, [350, 150])
+        screen.blit(text2, [225, 200])
+    elif stage == END:
+        text1 = MY_FONT.render("Game Over", True, WHITE)
+        text2 = MY_FONT.render("(Press SPACE to restart.)", True, WHITE)
+        screen.blit(text1, [310, 150])
+        screen.blit(text2, [210, 200])
+
     
     # Update screen (Actually draw the picture in the window.)
     pygame.display.flip()
-
+    clock.tick(refresh_rate)
 
     # Limit refresh rate of game loop 
     clock.tick(refresh_rate)
