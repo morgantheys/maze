@@ -119,6 +119,9 @@ doors = [door1, door2]
 # Make collidables
 collidables = walls + doors
 
+# Fonts
+MY_FONT = pygame.font.Font(None, 50)
+
 # Splashscreen
 started = False
 def splashscreen():
@@ -128,13 +131,18 @@ def splashscreen():
         text = font.render("Press Space to Play", 1, PINK)
         text_rect = text.get_rect(center=(465, 240))
         screen.blit(text, text_rect)
+
+def setup():
+    global stage,win, doors_open, score, ticks, time_remaining
+    win = False
+    doors_open = False
+    score = 0
+    ticks = 0
+    time_remaining = 25
+    stage = START
     
 # Game loop
-win = False
-doors_open = False
-score = 0
-ticks = 0
-time_remaining = 60
+setup() 
 
 done = False
 
@@ -147,21 +155,27 @@ while not done:
         if event.type == pygame.MOUSEBUTTONUP:
             print(event.pos)
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                if not started:
-                    started = True
-            
-            
+            if stage == START:
+                if event.key == pygame.K_SPACE:
+                    stage = PLAYING
+                    
+            elif stage == PLAYING:
+                pass
+                    
+            elif stage == END:
+                if event.key == pygame.K_SPACE:
+                    setup()
 
-    pressed = pygame.key.get_pressed()
 
-    up = pressed[pygame.K_UP]
-    down = pressed[pygame.K_DOWN]
-    left = pressed[pygame.K_LEFT]
-    right = pressed[pygame.K_RIGHT]
-
-    if started:
+    if stage == PLAYING:
         
+        pressed = pygame.key.get_pressed()
+
+        up = pressed[pygame.K_UP]
+        down = pressed[pygame.K_DOWN]
+        left = pressed[pygame.K_LEFT]
+        right = pressed[pygame.K_RIGHT]
+
         if up:
             player_vy = -player_speed
         elif down:
@@ -176,73 +190,49 @@ while not done:
         else:
             player_vx = 0
 
-        ticks += 1
-
-        if stage == START:
-            if event.key == pygame.K_SPACE:
-                    stage = PLAYING
-                    
-        elif stage == PLAYING:
-            if event.key == pygame.K_LEFT:
-                    block_vel[0] -= 2
-            elif event.key == pygame.K_RIGHT:
-                    block_vel[0] += 2
-            elif event.key == pygame.K_UP:
-                    block_vel[1] -= 2
-            elif event.key == pygame.K_DOWN:
-                    block_vel[1] += 2
-                    
-        elif stage == END:
-            if event.key == pygame.K_SPACE:
-                    setup()
-
-        font = pygame.font.Font(None, 48)
-        text = font.render(str(time_remaining), 1, PINK)
-        text_rect = text.get_rect(center=(820, 40))
-        screen.blit(text, text_rect)
-
-
         
     # Game logic (Check for collisions, update points, etc.)
-    ''' move the player in horizontal direction '''
-    player[0] += player_vx
 
-    ''' resolve collisions horizontally '''
-    for c in collidables:
-        if intersects.rect_rect(player, c):        
-            if player_vx > 0:
-                player[0] = c[0] - player[2]
-            elif player_vx < 0:
-                player[0] = c[0] + c[2]
-    ''' move the player in vertical direction '''
-    player[1] += player_vy
-    
-    for c in collidables:
-        if intersects.rect_rect(player, c):                    
-            if player_vy > 0:
-                player[1] = c[1] - player[3]
-            if player_vy < 0:
-                player[1] = c[1] + c[3]
-
-
-    ''' here is where you should resolve player collisions with screen edges '''
-    top = player[1]
-    bottom = player[1] + player[3]
-    left = player[0]
-    right = player[0] + player[2]
-    
-    if top < 0:
-        player[1] = 0
-    elif bottom > HEIGHT:
-        player[1] = HEIGHT - player[3]
-
-    if left < 0:
-        player[0] = 0
-    elif right > WIDTH:
-        player[0] = WIDTH - player[2]
-
-    ''' timer stuff '''
     if stage == PLAYING:
+        ''' move the player in horizontal direction '''
+        player[0] += player_vx
+
+        ''' resolve collisions horizontally '''
+        for c in collidables:
+            if intersects.rect_rect(player, c):        
+                if player_vx > 0:
+                    player[0] = c[0] - player[2]
+                elif player_vx < 0:
+                    player[0] = c[0] + c[2]
+        ''' move the player in vertical direction '''
+        player[1] += player_vy
+        
+        for c in collidables:
+            if intersects.rect_rect(player, c):                    
+                if player_vy > 0:
+                    player[1] = c[1] - player[3]
+                if player_vy < 0:
+                    player[1] = c[1] + c[3]
+
+
+        ''' here is where you should resolve player collisions with screen edges '''
+        top = player[1]
+        bottom = player[1] + player[3]
+        left = player[0]
+        right = player[0] + player[2]
+        
+        if top < 0:
+            player[1] = 0
+        elif bottom > HEIGHT:
+            player[1] = HEIGHT - player[3]
+
+        if left < 0:
+            player[0] = 0
+        elif right > WIDTH:
+            player[0] = WIDTH - player[2]
+
+        ''' timer stuff '''
+
         ticks += 1
 
         if ticks % refresh_rate == 0:
@@ -253,83 +243,85 @@ while not done:
 
 
 
-    ''' get the coins '''
-     #coins = [c for c in coins if not intersects.rect_rect(player, c)]
+        ''' get the coins '''
+         #coins = [c for c in coins if not intersects.rect_rect(player, c)]
 
-    '''
-    hit_list = []
+        '''
+        hit_list = []
 
-    for c in coins:
-        if intersects.rect_rect(player, c):
-            hit_list.append(c)
-    '''
-    
-    hit_list = [c for c in coins if intersects.rect_rect(player, c)]
-
-    for hit in hit_list:
-        coins.remove(hit)
-        score += 1
-        print("sound!")
+        for c in coins:
+            if intersects.rect_rect(player, c):
+                hit_list.append(c)
+        '''
         
+        hit_list = [c for c in coins if intersects.rect_rect(player, c)]
+
+        for hit in hit_list:
+            coins.remove(hit)
+            score += 1
+            print("sound!")
+            
 
 
-    if len(coins) == 0:
-        win = True
+        if len(coins) == 0:
+            win = True
 
 
-    ''' open door on switch contact '''
-    if intersects.rect_rect(player, switch):
-        doors_open = True
+        ''' open door on switch contact '''
+        if intersects.rect_rect(player, switch):
+            doors_open = True
 
-        collidables = [c for c in collidables if c not in doors]
+            collidables = [c for c in collidables if c not in doors]
         
         
     # Drawing code (Describe the picture. It isn't actually drawn yet.)
     screen.fill(SKY_BLUE)
 
-    pygame.draw.rect(screen, BLACK, player)
-    
-    for w in walls:
-        pygame.draw.rect(screen, DINO_GREEN, w)
+    if stage == PLAYING:
+        pygame.draw.rect(screen, BLACK, player)
+        
+        for w in walls:
+            pygame.draw.rect(screen, DINO_GREEN, w)
 
-    for c in coins:
-        pygame.draw.rect(screen, YELLOW, c)
+        for c in coins:
+            pygame.draw.rect(screen, YELLOW, c)
 
-    pygame.draw.rect(screen, DINO_GREEN, switch)
+        pygame.draw.rect(screen, DINO_GREEN, switch)
 
-    if not doors_open:
-        for d in doors:
-            pygame.draw.rect(screen, DINO_GREEN, d)
+        if not doors_open:
+            for d in doors:
+                pygame.draw.rect(screen, DINO_GREEN, d)
 
 
-    splashscreen()
-    if started:
         font = pygame.font.Font(None, 48)
         text = font.render("Score: " + str(score), 1, PINK)
         text_rect = text.get_rect(center=(820, 40))
         screen.blit(text, text_rect)
+        
+
+        ''' timer text '''
+        timer_text = MY_FONT.render(str(time_remaining), True, WHITE)
+        screen.blit(timer_text, [50, 50])
+
     
+    ''' begin/end game text '''
+    if stage == START:
+        splashscreen()
+        #text1 = MY_FONT.render("Block", True, WHITE)
+        #screen.blit(text1, [500, 180])
+        #screen.blit(text2, [225, 200])
+        
+    elif stage == END:
+        text1 = MY_FONT.render("Game Over", True, WHITE)
+        text2 = MY_FONT.render("(Press SPACE to restart.)", True, WHITE)
+        screen.blit(text1, [400, 240])
+        screen.blit(text2, [301, 272])
+        
     if win:
         font = pygame.font.Font(None, 48)
         text = font.render("You Win!", 1, PINK)
         text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2))
         screen.blit(text, text_rect)
-
-    ''' timer text '''
-    timer_text = MY_FONT.render(str(time_remaining), True, WHITE)
-    screen.blit(timer_text, [50, 50])
-    
-    ''' begin/end game text '''
-    if stage == START:
-        text1 = MY_FONT.render("Block", True, WHITE)
-        text2 = MY_FONT.render("(Press SPACE to play.)", True, WHITE)
-        screen.blit(text1, [350, 150])
-        screen.blit(text2, [225, 200])
-    elif stage == END:
-        text1 = MY_FONT.render("Game Over", True, WHITE)
-        text2 = MY_FONT.render("(Press SPACE to restart.)", True, WHITE)
-        screen.blit(text1, [310, 150])
-        screen.blit(text2, [210, 200])
 
     
     # Update screen (Actually draw the picture in the window.)
